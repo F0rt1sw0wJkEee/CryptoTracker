@@ -1,0 +1,82 @@
+<UserControl
+    x:Class="UWP.UserControls.AlertListGrouped"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="using:UWP.Models"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    d:Height="200"
+    d:Width="600"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <CollectionViewSource x:Name="cvs" IsSourceGrouped="True" Source="{x:Bind CvsSource, Mode=OneWay}"/>
+    </UserControl.Resources>
+
+    <ListView ItemsSource="{Binding Source={StaticResource cvs}}" SelectionMode="None">
+        <ListView.ItemContainerStyle>
+            <Style BasedOn="{StaticResource ListViewItemExpanded}" TargetType="ListViewItem">
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="models:Alert">
+                <StackPanel Margin="50 0" Padding="0" Orientation="Horizontal">
+                    <ToggleSwitch
+                        Grid.Column="0"
+                        MinWidth="50"
+                        HorizontalAlignment="Left"
+                        IsOn="{x:Bind Enabled, Mode=TwoWay}"
+                        OffContent=""
+                        OnContent=""/>
+                    <ComboBox
+                        Grid.Column="2"
+                        Width="95"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource ApplicationPointerOverForegroundThemeBrush}"
+                        PlaceholderText="Mode"
+                        SelectedItem="{x:Bind Mode, Mode=TwoWay}">
+                        <x:String>above</x:String>
+                        <x:String>below</x:String>
+                    </ComboBox>
+                    <muxc:NumberBox
+                        Grid.Column="3"
+                        Width="90"
+                        Margin="5 0"
+                        VerticalAlignment="Center"
+                        PlaceholderText="Threshold"
+                        Value="{x:Bind Threshold, Mode=TwoWay}"/>
+                    <Button
+                        Grid.Column="4"
+                        Margin="0"
+                        Padding="10 9"
+                        Background="Transparent"
+                        Click="Delete_alert"
+                        Content="&#xE107;"
+                        FontFamily="{StaticResource FluentIconFont}"/>
+                </StackPanel>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+        <ListView.GroupStyle>
+            <GroupStyle>
+                <GroupStyle.HeaderTemplate>
+                    <DataTemplate>
+                        <TextBlock
+                            Margin="0"
+                            FontSize="15"
+                            FontWeight="Bold"
+                            Text="{Binding Key, Mode=OneWay}"/>
+                    </DataTemplate>
+                </GroupStyle.HeaderTemplate>
+            </GroupStyle>
+        </ListView.GroupStyle>
+
+        <!--  For previsualization purposes  -->
+        <d:Rectangle/>
+    </ListView>
+
+
+</UserControl>
