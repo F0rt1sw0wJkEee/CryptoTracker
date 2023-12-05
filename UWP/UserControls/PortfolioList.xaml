@@ -1,0 +1,289 @@
+<UserControl
+    x:Class="UWP.UserControls.PortfolioList"
+    x:DefaultBindMode="OneWay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:usercontrols="using:CryptoTracker.UserControls"
+    xmlns:converters="using:UWP.Converters"
+    xmlns:models="using:UWP.Models"
+    d:Height="200" d:Width="600"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibility x:Key="BoolVisibility"/>
+        <converters:BoolToVisibility x:Key="BoolVisibilityNOT" Inverse="True"/>
+        <converters:DateTimeOffsetShortener x:Key="DateOffsetShortener"/>
+        <converters:DoubleToVisibilityConverter x:Key="DoubleToVisibilityNOT" Inverse="True"/>
+        <converters:StringNullOrEmptyToBoolConverter x:Key="StringEmptyBoolNOT" Inverse="True"/>
+        <converters:NumberGreaterThanTargetToBoolConverter x:Key="BiggerThan1ToTrue" Target="1"/>
+
+        <Style TargetType="usercontrols:DoubleTextBlock">
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ListView
+        x:Name="ListView"
+        Margin="0 0 -10 0"
+        Padding="0 0 10 0"
+        ItemsSource="{x:Bind Purchases, Mode=OneWay}"
+        SelectionMode="None">
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="VerticalAlignment" Value="Top"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="0"/>
+            </Style>
+        </ListView.ItemContainerStyle>
+
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="models:PurchaseModel">
+                <!-- Must wrap it w/UserControl for VisualStateManager -->
+                <UserControl>
+                    <StackPanel
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        BorderBrush="{ThemeResource ButtonBorderBrush}" BorderThickness="1"
+                        CornerRadius="6" Padding="15 10" Margin="0 5">
+
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup>
+                                <VisualState x:Name="NarrowState">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="0"/>
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="Gridd.ColumnDefinitions[2].Width" Value="0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+
+                                <VisualState x:Name="NormalState">
+                                    <VisualState.StateTriggers>
+                                        <AdaptiveTrigger MinWindowWidth="750" />
+                                    </VisualState.StateTriggers>
+                                    <VisualState.Setters>
+                                        <Setter Target="Gridd.ColumnDefinitions[2].Width" Value="*"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        
+                        <StackPanel.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuFlyoutItem Text="See coin" Click="PurchaseGoToCoin_Click">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Find"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem 
+                                    Text="Edit" Click="PurchaseEdit_Click"
+                                    Visibility="{Binding ElementName=ListView, FallbackValue=Collapsed, Path=DataContext.Grouped, Converter={StaticResource BoolVisibilityNOT}}">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Edit"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem
+                                    Text="Duplicate" Click="PurchaseDuplicate_Click"
+                                    Visibility="{Binding ElementName=ListView, FallbackValue=Collapsed, Path=DataContext.Grouped, Converter={StaticResource BoolVisibilityNOT}}">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Copy"/>
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="Remove" Click="PurchaseRemove_Click">
+                                    <MenuFlyoutItem.Icon>
+                                        <SymbolIcon Symbol="Delete"/>
+                                    </MenuFlyoutItem.Icon>
+                                    <MenuFlyoutItem.Resources>
+                                        <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="IndianRed"/>
+                                        <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="IndianRed"/>
+                                        <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed" Color="IndianRed"/>
+                                    </MenuFlyoutItem.Resources>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </StackPanel.ContextFlyout>
+
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                            <TextBlock
+                                x:Name="_"
+                                x:Load="{x:Bind GroupedQty, Converter={StaticResource BiggerThan1ToTrue}}"
+                                FontWeight="SemiLight"
+                                Opacity="0.7">
+                                <Run Text="{x:Bind GroupedQty}"/><Run Text="x"/>
+                            </TextBlock>
+                            <TextBlock d:Text="Purchase - 01 Jan, 2021" Opacity="0.7" FontWeight="SemiLight">
+                                <Run Text="{x:Bind Type}"/>
+                                <Run Text="-"/>
+                                <Run Text="{x:Bind Date, Converter={StaticResource DateOffsetShortener}}"/>
+                            </TextBlock>
+                        </StackPanel>
+                        <Grid x:Name="Gridd" Margin="0 5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image
+                                d:Source="ms-appx:///Assets/Icons/iconNULL.png"
+                                Source="{x:Bind CryptoLogo}" Width="28"/>
+
+                            <StackPanel Grid.Column="1" Margin="7 0">
+                                <StackPanel Orientation="Horizontal" Spacing="5" Margin="0 0 0 -3">
+                                    <TextBlock d:Text="Crypto" Text="{x:Bind CryptoName}" FontWeight="Bold"/>
+                                    <FontIcon Glyph="&#xE7BA;" FontSize="16"
+                                              ToolTipService.ToolTip="No price data found"
+                                              ToolTipService.Placement="Right"
+                                              Visibility="{x:Bind Current, Converter={StaticResource DoubleToVisibilityNOT}}"/>
+                                </StackPanel>
+                                <usercontrols:DoubleTextBlock
+                                    HorizontalAlignment="Left"
+                                    Private="{Binding ElementName=ListView, Path=DataContext.PrivateMode}">
+                                    <usercontrols:DoubleTextBlock.Value>
+                                        <TextBlock d:Text="0.12 XXX" FontWeight="Normal" FontSize="14">
+                                            <Run Text="{x:Bind CryptoQty, Converter={StaticResource NumberFormatter}}"/>
+                                            <Run Text="{x:Bind Crypto}"/>
+                                        </TextBlock>
+                                    </usercontrols:DoubleTextBlock.Value>
+                                </usercontrols:DoubleTextBlock>
+                            </StackPanel>
+
+                            <usercontrols:DoubleTextBlock
+                                Grid.Column="2"
+                                Header="Buy price"
+                                Orientation="Vertical"
+                                Spacing="-5">
+                                <usercontrols:DoubleTextBlock.Value>
+                                    <TextBlock>
+                                        <Run Text="{x:Bind BoughtAt, Converter={StaticResource NumberFormatter}}"/><Run Text="{x:Bind CurrencySymbol}"/>
+                                    </TextBlock>
+                                </usercontrols:DoubleTextBlock.Value>
+                            </usercontrols:DoubleTextBlock>
+
+                            <usercontrols:DoubleTextBlock
+                                Grid.Column="3"
+                                Header="Invested"
+                                Orientation="Vertical"
+                                Private="{Binding ElementName=ListView, Path=DataContext.PrivateMode}"
+                                Spacing="-5">
+                                <usercontrols:DoubleTextBlock.Value>
+                                    <TextBlock d:Text="0€">
+                                        <Run Text="{x:Bind InvestedQty, Converter={StaticResource NumberFormatter}}"/><Run Text="{x:Bind CurrencySymbol}"/>
+                                    </TextBlock>
+                                </usercontrols:DoubleTextBlock.Value>
+                            </usercontrols:DoubleTextBlock>
+
+                            <usercontrols:DoubleTextBlock
+                                Grid.Column="4"
+                                Header="Worth"
+                                Private="{Binding ElementName=ListView, Path=DataContext.PrivateMode}"
+                                Orientation="Vertical"
+                                Spacing="-5">
+                                <usercontrols:DoubleTextBlock.Value>
+                                    <TextBlock d:Text="0€">
+                                        <Run Text="{x:Bind Worth, Converter={StaticResource NumberFormatter}}"/><Run Text="{x:Bind CurrencySymbol}"/>
+                                    </TextBlock>
+                                </usercontrols:DoubleTextBlock.Value>
+                            </usercontrols:DoubleTextBlock>
+
+                            <usercontrols:DoubleTextBlock
+                                Grid.Column="5"
+                                Header="Delta"
+                                Orientation="Vertical"
+                                Spacing="-5">
+                                <usercontrols:DoubleTextBlock.Value>
+                                    <TextBlock Foreground="{x:Bind Delta, Converter={StaticResource NumberForeground}}">
+                                        <Run Text="{x:Bind Delta, Converter={StaticResource NumberSymbol}}"/><!--
+                                        --><Run Text="%" FontSize="14"/>
+                                    </TextBlock>
+                                </usercontrols:DoubleTextBlock.Value>
+                            </usercontrols:DoubleTextBlock>
+                        </Grid>
+
+                        <StackPanel
+                            x:Name="DetailsPanel"
+                            BorderBrush="{ThemeResource ButtonBorderBrush}" BorderThickness="0 1 0 0"
+                            Margin="0 5 0 0" Padding="0 5 0 0"
+                            Visibility="{Binding ElementName=ListView, Path=DataContext.ShowDetails, Converter={StaticResource BoolVisibility}, FallbackValue=Collapsed}">
+                            <StackPanel Orientation="Vertical">
+                                <RelativePanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <usercontrols:DoubleTextBlock
+                                            Header="Currently:"
+                                            Orientation="Horizontal"
+                                            HorizontalAlignment="Left"
+                                            Spacing="10">
+                                            <usercontrols:DoubleTextBlock.Value>
+                                                <TextBlock FontSize="16">
+                                                    <Run Text="{x:Bind Current}"/><Run Text="{x:Bind CurrencySymbol}"/>
+                                                </TextBlock>
+                                            </usercontrols:DoubleTextBlock.Value>
+                                        </usercontrols:DoubleTextBlock>
+                                    </StackPanel>
+
+                                    <usercontrols:DoubleTextBlock
+                                        Header="Profits:"
+                                        Spacing="10"
+                                        Private="{Binding ElementName=ListView, Path=DataContext.PrivateMode}"
+                                        RelativePanel.AlignBottomWithPanel="True" RelativePanel.AlignRightWithPanel="True">
+                                        <usercontrols:DoubleTextBlock.Value>
+                                            <TextBlock Foreground="{x:Bind Delta, Converter={StaticResource NumberForeground}}">
+                                                <Run Text="{x:Bind Profit}"/><Run Text="{x:Bind CurrencySymbol}"/>
+                                            </TextBlock>
+                                        </usercontrols:DoubleTextBlock.Value>
+                                    </usercontrols:DoubleTextBlock>
+
+                                </RelativePanel>
+                            </StackPanel>
+
+                            <!-- Row 2 -->
+                            <usercontrols:DoubleTextBlock
+                                x:Name="Row2" x:Load="{x:Bind Exchange, Converter={StaticResource StringEmptyBoolNOT}}"
+                                Header="Exchange:"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Spacing="10">
+                                <usercontrols:DoubleTextBlock.Value>
+                                    <TextBlock FontSize="16">
+                                        <Run Text="{x:Bind Exchange}"/>
+                                    </TextBlock>
+                                </usercontrols:DoubleTextBlock.Value>
+                            </usercontrols:DoubleTextBlock>
+
+                            <!-- Row 3 -->
+                            <StackPanel
+                                x:Name="Row3" x:Load="{x:Bind Notes, Converter={StaticResource StringEmptyBoolNOT}}"
+                                Orientation="Horizontal">
+                                <TextBlock
+                                    Grid.Row="2"
+                                    Text="Notes:" Opacity="0.6"
+                                    Width="72"
+                                    VerticalAlignment="Center"/>
+                                <TextBlock
+                                    Grid.Row="2" Grid.Column="1"
+                                    FontWeight="SemiBold" FontSize="16"
+                                    Text="{x:Bind Notes}"/>
+
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </UserControl>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+
+        <!-- For previsualization purposes -->
+        <d:Rectangle/>
+    </ListView>
+    
+    
+</UserControl>
