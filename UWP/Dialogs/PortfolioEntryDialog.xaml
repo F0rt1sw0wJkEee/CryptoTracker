@@ -1,0 +1,187 @@
+<ContentDialog
+    x:Class="CryptoTracker.Dialogs.PortfolioEntryDialog"
+    x:DefaultBindMode="OneWay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:usercontrols="using:UWP.UserControls"
+    mc:Ignorable="d"
+    d:Height="500"
+    CloseButtonText="Cancel"
+    CornerRadius="8"
+    DefaultButton="Primary"
+    PrimaryButtonText="Add"
+    PrimaryButtonClick="PurchaseDialog_PrimaryButtonClick"
+    TabIndex="6"
+    Title="NEW TRANSACTION">
+
+    <ContentDialog.Resources>
+        <Style TargetType="muxc:NumberBox">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="PlaceholderText" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="Width" Value="140"/>
+        </Style>
+
+        <Style TargetType="controls:HeaderedContentControl">
+            <Setter Property="Width" Value="140"/>
+        </Style>
+    </ContentDialog.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            x:Name="WarningMsg"
+            Text="Error, you must fill at least Crypto, Quantity and Invested fields."
+            HorizontalAlignment="Center"
+            FontWeight="Light" Foreground="Red"
+            Visibility="Collapsed"/>
+
+        <controls:UniformGrid Grid.Row="1" Columns="3" Rows="4" Margin="0 15" RowSpacing="15" ColumnSpacing="35">
+            <!-- Row 0 -->
+            <Canvas>
+                <!-- Dialog focuses on first element, so create a decoy Combobox -->
+                <ComboBox Opacity="0" Width="1" Height="1" TabIndex="0"/>
+
+                <usercontrols:CoinAutoSuggestBox
+                    Coin="{x:Bind SuggestionCoin, Mode=TwoWay}"
+                    Header=" Crypto"
+                    TabIndex="1" HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    Width="140"/>
+            </Canvas>
+
+            <muxc:NumberBox
+                x:Name="AmountNumberBox"
+                AcceptsExpression="True" Header=" Quantity"
+                LostFocus="DialogBtn_LostFocus"
+                TabIndex="1"
+                Value="{x:Bind NewPurchase.CryptoQty, Mode=TwoWay}"/>
+            <muxc:NumberBox
+                AcceptsExpression="True" Header=" Cost (incl. fee)"
+                LostFocus="DialogBtn_LostFocus"
+                TabIndex="1"
+                Value="{x:Bind NewPurchase.InvestedQty, Mode=TwoWay}"/>
+
+
+            <!-- Row 1 -->
+            <DatePicker
+                Date="{x:Bind NewPurchase.Date, Mode=TwoWay}"
+                Grid.Row="1" Grid.ColumnSpan="2"
+                Header=" Date" HorizontalAlignment="Stretch"
+                TabIndex="2"/>
+
+            <muxc:NumberBox
+                Header="Transaction fee"
+                LostFocus="DialogBtn_LostFocus"
+                Maximum="{x:Bind NewPurchase.InvestedQty}"
+                Minimum="0"
+                TabIndex="2"
+                Value="{x:Bind NewPurchase.TransactionFee, Mode=TwoWay}"/>
+            
+            <!--<ComboBox
+                Foreground="{ThemeResource ApplicationPointerOverForegroundThemeBrush}"
+                Header=" Fiat"
+                Margin="0 0 0 0" Width="130"
+                PlaceholderText="{x:Bind NewPurchase.Currency, Mode=OneTime}"
+                ItemsSource="{x:Bind AvailableCurrencies, Mode=OneTime}"
+                SelectedValue="{x:Bind NewPurchase.Currency, Mode=TwoWay}"
+                SelectedValuePath="Key">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Key}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>-->
+            <Rectangle />
+
+
+            <!-- Row 2 -->
+            <TextBox
+                Grid.Row="2" Grid.ColumnSpan="1"
+                Header=" Exchange"
+                Text="{x:Bind NewPurchase.Exchange, Mode=TwoWay}"
+                PlaceholderText="CoinBase"
+                TabIndex="3"
+                HorizontalAlignment="Stretch"/>
+            
+            
+            <Rectangle />
+            
+
+            <!-- Row 3 -->
+            <TextBox
+                Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                Header=" Notes"  HorizontalAlignment="Stretch"
+                PlaceholderText="Note..."
+                TabIndex="3"
+                Text="{x:Bind NewPurchase.Notes, Mode=TwoWay}"/>
+            
+            <!--<ToggleSwitch Header="Manual buy price" Grid.Row="3" Grid.Column="2" Visibility="Collapsed"/>-->
+
+
+
+            <!-- Row 4 -->
+            <controls:HeaderedContentControl 
+                Foreground="{ThemeResource TextControlHeaderForegroundDisabled}"
+                Grid.Row="3" Header=" Worth" HorizontalContentAlignment="Stretch"
+                Margin="0 0 0 0" VerticalAlignment="Bottom">
+                <StackPanel
+                    Background="{ThemeResource TextBoxDisabledBackgroundThemeBrush}"
+                    BorderBrush="{ThemeResource TextControlBorderBrushDisabled}"
+                    BorderThickness="1"
+                    Padding="6" Margin="0 5 0 0"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <TextBlock
+                        Foreground="{ThemeResource TextControlForegroundDisabled}">
+                        <Run Text="{x:Bind NewPurchase.Worth}"/><!--
+                        --><Run Text="{x:Bind NewPurchase.CurrencySymbol}"/>
+                    </TextBlock>
+                </StackPanel>
+            </controls:HeaderedContentControl>
+            <controls:HeaderedContentControl
+                Foreground="{ThemeResource TextControlHeaderForegroundDisabled}"
+                Grid.Row="3" Grid.Column="1" Header=" Profit" HorizontalContentAlignment="Stretch"
+                VerticalAlignment="Bottom">
+                <StackPanel
+                    Background="{ThemeResource TextBoxDisabledBackgroundThemeBrush}"
+                    BorderBrush="{ThemeResource TextControlBorderBrushDisabled}"
+                    BorderThickness="1"
+                    Padding="6" Margin="0 5 0 0"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <TextBlock
+                        Foreground="{x:Bind NewPurchase.ProfitFG, FallbackValue='Gray'}">
+                        <Run Text="{x:Bind NewPurchase.Profit}"/><!--
+                        --><Run Text="{x:Bind NewPurchase.CurrencySymbol}"/>
+                    </TextBlock>
+                </StackPanel>
+            </controls:HeaderedContentControl>
+
+            <controls:HeaderedContentControl
+                Foreground="{ThemeResource TextControlHeaderForegroundDisabled}"
+                Grid.Row="3" Grid.Column="2" HorizontalContentAlignment="Stretch"
+                Header=" Buy price" VerticalAlignment="Bottom">
+                <StackPanel
+                    Background="{ThemeResource TextBoxDisabledBackgroundThemeBrush}"
+                    BorderBrush="{ThemeResource TextControlBorderBrushDisabled}"
+                    BorderThickness="1"
+                    Padding="6" Margin="0 5 0 0"
+                    CornerRadius="{ThemeResource ControlCornerRadius}">
+                    <TextBlock>
+                        <Run Text="{x:Bind NewPurchase.BoughtAt}"/><!--
+                        --><Run Text="{x:Bind NewPurchase.CurrencySymbol}"/>
+                    </TextBlock>
+                </StackPanel>
+            </controls:HeaderedContentControl>
+        </controls:UniformGrid>
+
+    </Grid>
+</ContentDialog>
