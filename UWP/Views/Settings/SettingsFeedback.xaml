@@ -1,0 +1,104 @@
+<Page
+    x:Class="UWP.Views.SettingsFeedback"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:lottie="using:Microsoft.Toolkit.Uwp.UI.Lottie"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:usercontrols="using:UWP.UserControls"
+    xmlns:viewModels="using:UWP.ViewModels"
+    d:Height="600" d:Width="500" mc:Ignorable="d">
+
+    <Page.DataContext>
+        <viewModels:SettingsViewModel x:Name="vm"/>
+    </Page.DataContext>
+    
+    <!-- //////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////// -->
+    <ScrollViewer>
+        <StackPanel Spacing="3" Margin="0 0 15 0">
+            <StackPanel.ChildrenTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition />
+                </TransitionCollection>
+            </StackPanel.ChildrenTransitions>
+
+            <Canvas>
+                <Border Height="560">
+                    <!--AnimatedVisualPlayer with AutoPlay-->
+                    <muxc:AnimatedVisualPlayer x:Name="LottiePlayer" AutoPlay="False">
+                        <!--LottieVisualSource with JSON UriSource-->
+                        <lottie:LottieVisualSource UriSource="ms-appx:///Assets/confetti.json"/>
+                    </muxc:AnimatedVisualPlayer>
+                </Border>
+            </Canvas>
+            
+            
+            <!-- REVIEW -->
+            <usercontrols:SettingsBlockControl
+                Title="Review"
+                Description="Take a minute and leave a review on the Store">
+                <usercontrols:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE134;"/>
+                </usercontrols:SettingsBlockControl.Icon>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Click="Feedback_Rating" Content="Rate"/>
+                    <Button Click="Feedback_Review" Content="Review"/>
+                </StackPanel>
+            </usercontrols:SettingsBlockControl>
+            
+            
+            <!-- FEEDBACK -->
+            <usercontrols:SettingsBlockControl
+                Title="Feedback"
+                Description="Let me know your thoughts about the app">
+                <usercontrols:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE939;"/>
+                </usercontrols:SettingsBlockControl.Icon>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button
+                        Click="Feedback_Mail" Content="Mail"
+                        Padding="24 7"
+                        ToolTipService.ToolTip="ismael.em@outlook.com"/>
+                    <Button
+                        Click="TwitterButton_Click" Content="Twitter"
+                        Padding="23 7"
+                        ToolTipService.ToolTip="@ismaelestalayo"/>
+                </StackPanel>
+            </usercontrols:SettingsBlockControl>
+            <usercontrols:SettingsBlockControl
+                Title="Code repository"
+                Description="Take a look at the source code and feel free to open issues or PRs">
+                <usercontrols:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE943;"/>
+                </usercontrols:SettingsBlockControl.Icon>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button
+                        Click="GithubRepo_Click" Content="Github"
+                        Padding="23 7"
+                        ToolTipService.ToolTip="ismaelestalayo/CryptoTracker"/>
+                </StackPanel>
+            </usercontrols:SettingsBlockControl>
+
+
+            <!-- DONATE -->
+            <usercontrols:SettingsBlockControl
+                Title="Donate"
+                Description="I have been developing this app since August 2017, so if you really enjoy using it and want to support it, you can donate in multiple ways 🤍">
+                <usercontrols:SettingsBlockControl.Icon>
+                    <FontIcon Glyph="&#xE8C7;"/>
+                </usercontrols:SettingsBlockControl.Icon>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Click="Donation_Paypal" Content="Paypal"/>
+                    <Button Click="Donation_Kofi" Content="Ko-fi"/>
+                </StackPanel>
+            </usercontrols:SettingsBlockControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
